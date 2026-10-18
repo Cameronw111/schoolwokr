@@ -13,6 +13,7 @@ class Deck(Observable):
     
     def add(self, card):
         self.__cards.append(card)
+        self.notify()
         
     def draw(self):
         card = self.__cards.pop(0)
@@ -33,6 +34,8 @@ class Deck(Observable):
     
     def clear(self):
         self.__cards.clear()
+        self.notify()
     
     def shuffle(self):
         random.shuffle(self.__cards)
+        self.notify()

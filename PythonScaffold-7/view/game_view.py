@@ -1,20 +1,19 @@
 from tkinter import *
 from tkinter import ttk
-from model.attack_type import AttackType
 from model.game import Game
+from model.exception.empty_deck_exception import EmptyDeckException
 from view.styles import Style
 from view.deck_view import DeckView
+from view.battle_view import BattleView
+from view.error_view import ErrorView
 from tk_utils import TkUtils
-class GameView:
-    def __init__(self, parent, card):
-        self.parent = parent
-        self.card = card
-        self.parent.title(card.get_name())
 
-        path = f"images/cards/{card.get_name().lower().replace(' ', '')}.png"
-        TkUtils.Image(self.parent, path, 300, 420).pack(**Style.padding_small)
-        Button(self.parent, text="Close", command=self.parent.destroy, **Style.button).pack(**Style.pack_stretch)
-        
+class GameView:
+    def __init__(self, parent, model: Game):
+        self.parent = parent
+        self.model = model
+        self.parent.title("Dashboard")
+
         Label(self.parent, text="Battle Hand", font=("Arial", 18, "bold")).pack(**Style.padding_medium)
         ttk.Separator(self.parent).pack(**Style.pack_stretch)
 
@@ -48,7 +47,7 @@ class GameView:
             button.grid(row=0, column=column, **Style.grid_stretch)
 
     def add_deck(self, parent, column, name, deck):
-        image = TkUtils.Image(parent, "images/deck.png", 100, 150)
+        image = TkUtils.Image(parent, "view/image/deck.png", 100, 150)
         image.grid(row=0, column=column, **Style.spacing)
         image.bind("<Button-1>", lambda event: self.open_deck(deck, name))
 
@@ -56,7 +55,7 @@ class GameView:
         DeckView(Toplevel(self.parent), deck, name)
 
     def open_battle_hand(self):
-        pass
+        BattleView(Toplevel(self.parent), self.model.get_battle_hand())
 
     def deal(self):
         try:
@@ -80,8 +79,4 @@ class GameView:
         self.weaken_button.config(state=NORMAL if self.amount.get() else DISABLED)
 
     def show_error(self, e):
-        error_window = Toplevel(self.parent)
-        error_window.title("Error")
-        Label(error_window, text=type(e).__name__, **Style.error).pack(**Style.padding_small)
-        Label(error_window, text=str(e), font=("Arial", 12)).pack(**Style.padding_small)
-        Button(error_window, text="Close", command=error_window.destroy, **Style.button).pack(**Style.padding_small)
+        ErrorView(Toplevel(self.parent), e)

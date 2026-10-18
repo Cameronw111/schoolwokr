@@ -21,9 +21,12 @@ class PlayerHand(Hand):
     def weaken(self, amount):
         for card in self.__cards:
             card.weaken(amount)
+        self.notify()
             
     def place(self, card):
         self.__cards.append(card)
+        self.notify()
         
     def draw(self, card):
         self.__cards.remove(card)
+        self.notify()

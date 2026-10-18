@@ -23,6 +23,7 @@ class BattleHand(Hand):
     def place(self, card):
         self.__cards[card.get_type().slot()] = card
         self.set_strength()
+        self.notify()
     
     def can_place(self, card):
         return self.__cards[card.get_type().slot()] == None

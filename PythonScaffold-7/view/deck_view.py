@@ -9,9 +9,15 @@ class DeckView:
         self.deck = deck
         self.parent.title(name)
 
-        self.listbox = Listbox(self.parent, **Style.listbox)
-        self.listbox.pack()
+        list_frame = Frame(self.parent)
+        list_frame.pack()
+        self.listbox = Listbox(list_frame, **Style.listbox)
+        self.listbox.pack(side=LEFT)
+        self.scrollbar = Scrollbar(list_frame, command=self.listbox.yview)
+        self.listbox.config(yscrollcommand=self.scrollbar.set)
         self.listbox.bind("<<ListboxSelect>>", self.update_buttons)
+
+        self.empty_label = Label(self.listbox, text="Empty", font=("Arial", 12), foreground="#333", background="white")
 
         buttons = Frame(self.parent)
         buttons.pack(**Style.pack_stretch)
@@ -28,8 +34,17 @@ class DeckView:
 
     def refresh(self):
         self.listbox.delete(0, END)
-        for card in self.deck.get_cards():
+        cards = self.deck.get_cards()
+        for card in cards:
             self.listbox.insert(END, str(card))
+        if cards:
+            self.empty_label.place_forget()
+        else:
+            self.empty_label.place(relx=0.5, rely=0.5, anchor=CENTER)
+        if len(cards) > int(self.listbox.cget("height")):
+            self.scrollbar.pack(side=RIGHT, fill=Y)
+        else:
+            self.scrollbar.pack_forget()
         self.update_buttons()
 
     def update_buttons(self, event=None):

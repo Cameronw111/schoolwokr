@@ -13,6 +13,11 @@ class PlayerView:
         self.hand = player.get_hand()
         self.parent.title(name)
 
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Treeview.Heading", font=("Arial", 11, "bold"), background="#d9d9d9", foreground="black", relief=RAISED, borderwidth=1, bordercolor="#a8a8a8")
+        style.map("Treeview.Heading", background=[("active", "#d9d9d9")])
+
         self.table = ttk.Treeview(self.parent, columns=("name", "type", "strength"), show="headings", height=5)
         self.table.heading("name", text="Name")
         self.table.heading("type", text="Type")
@@ -20,6 +25,7 @@ class PlayerView:
         self.table.column("name", anchor=CENTER)
         self.table.column("type", anchor=CENTER)
         self.table.column("strength", anchor=CENTER)
+        self.table.tag_configure("grey", background="#f0f0f0")
         self.table.pack(**Style.pack_stretch)
         self.table.bind("<<TreeviewSelect>>", self.update_buttons)
 
@@ -46,7 +52,11 @@ class PlayerView:
         cards = self.hand.get_cards()
         for i in range(len(cards)):
             card = cards[i]
-            self.table.insert("", END, iid=str(i), values=(card.get_name(), card.get_type().name, card.get_strength()))
+            values = (card.get_name(), card.get_type().name, card.get_strength())
+            if i % 2 == 1:
+                self.table.insert("", END, iid=str(i), values=values, tags=("grey",))
+            else:
+                self.table.insert("", END, iid=str(i), values=values)
 
         if len(cards) == 0:
             self.empty_label.place(relx=0.5, rely=0.6, anchor=CENTER)
